@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="https://cdn.skypack.dev/-/holiday.css@v0.9.5-Jl4gV7y2zMps6H5ZtJC8/dist=es2020,mode=raw/dist/holiday.css">
+    <style>
+        a {
+            color: rgb(130, 255, 180);
+        }
+        a:visited {
+            color: rgb(130, 255, 180);
+        }
+        a:hover {
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h3>{{ title }}</h3>
+        <nav>
+            <ul>
+                <li><a href="/list">View all suggestions</a></li>
+                <li><a href="/">Add a suggestion</a></li>
+                <li><a href="{{ backto }}">{{ backto_text }}</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+    <footer>
+        {{ footer_msg|safe }}
+    </footer>
+</body>
+</html>

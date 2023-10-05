@@ -1,0 +1,25 @@
+{% extends "common.html" %}
+
+{% block content %}
+<p>{{ motd|safe }}</p>
+
+<form action="/add" method="POST">
+    <p>*: Required</p>
+    <label for="type">Media Type*</label>
+    <select name="type" id="type" required>
+        {% for type in types %}
+        <option value="{{ type[0] }}">{{ type[1] }}</option>
+        {% endfor %}
+    </select>
+    <label for="callsign">Callsign (An anonymous string of your choosing to identify your contributions)</label>
+    <input type="text" name="callsign" id="callsign" maxlength="30">
+    <label for="url">URL/Magnet URI*</label>
+    <input type="text" name="url" id="url" required>
+    <label for="title">Media Title*</label>
+    <input type="text" name="title" id="title" required>
+    <label for="desc">Suggestion Description (Why should this media be added to Endless Night?)*</label>
+    <textarea name="desc" id="desc" cols="30" rows="10" required></textarea>
+    <br>
+    <input type="submit" value="Add Suggestion">
+</form>
+{% endblock %}
