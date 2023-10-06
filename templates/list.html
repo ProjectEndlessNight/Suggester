@@ -1,9 +1,13 @@
 {% extends "common.html" %}
 
 {% block content %}
-<ul>
-    {% for suggestion in suggestions %}
-    <li>{{ suggestion["title"] }} ({{ types[suggestion["type"]] }}) {% if suggestion["approved"] %}- <b>APPROVED</b>{% endif %}</li>
-    {% endfor %}
-</ul>
+{% for suggestion in suggestions %}
+<details>
+    <summary>{{ suggestion["title"] }} - {{ types[suggestion["type"]] }} {% if suggestion["approved"] %}- <b>APPROVED</b>{% endif %} {% if suggestion["added"] %} <b>AND ADDED</b>{% endif %}</summary>
+    {{ suggestion["date"] }}
+    <br>
+    {{ suggestion["desc"] }}
+</details>
+<br>
+{% endfor %}
 {% endblock %}

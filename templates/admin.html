@@ -3,9 +3,53 @@
 {% block content %}
 <p>{{ msg|safe }}</p>
 
-{% set i = 0 %}
-{% for suggestion in suggestions %}
-    <p>{{ suggestion["title"] }} ({{ types[suggestion["type"]] }}) - ID {{ i }} </p>
-    {% set i = i + 1 %}
-{% endfor %}
+<h3>Unreviewed Suggestions</h3>
+
+<ol start="0">
+    {% for suggestion in suggestions %}
+    <li>
+        <details>
+            <summary>{{ suggestion["title"] }} ({{ types[suggestion["type"]] }}) - ID {{ loop.index0 }}</summary>
+            {{ suggestion["date"] }}
+            <br>
+            {{ suggestion["desc"] }}
+        </details>
+    </li>
+    {% endfor %}
+</ol>
+
+<form action="/admin/review" method="POST">
+    <label for="input_id">Suggestion ID</label>
+    <select name="id" id="input_id" required>
+        {% for suggestion in suggestions %}
+        <option value="{{ loop.index0 }}">{{ loop.index0 }} ({{ suggestion["title"] }})</option>
+        {% endfor %}
+    </select>
+    <label for="action">Action</label>
+    <select name="action" id="action" required>
+        <option value="accept">Accept suggestion</option>
+        <option value="reject">Reject suggestion</option>
+    </select>
+    <br>
+    <input type="submit" value="Review Suggestion">
+</form>
+
+<h3>Suggestions Pending Addition</h3>
+
+<ol start="0">
+    {% for suggestion in reviewed %}
+        {% if not suggestion["added"] %}
+        <li>
+            <details>
+                <summary>{{ suggestion["title"] }} ({{ types[suggestion["type"]] }}) - ID {{ loop.index0 }}</summary>
+                {{ suggestion["date"] }}
+                <br>
+                {{ suggestion["desc"] }}
+                <br>
+                <form action="/admin/markadded/{{ loop.index0 }}" method="GET"><input type="submit" value="Mark Added"></form>
+            </details>
+        </li>
+        {% endif %}
+    {% endfor %}
+</ol>
 {% endblock %}

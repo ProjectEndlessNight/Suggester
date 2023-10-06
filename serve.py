@@ -20,7 +20,7 @@ PORT = 5000 # port to run the server on
 ADMIN_PASSWD = "password" # password to access the admin panel
 # more advanced config, you probably don't need to mess with this
 # types are in the format ["type", "display name"]
-TYPES = [["movies", "Movies"], ["tv", "TV"], ["music", "Music"], ["books", "eBooks"], ["audiobooks", "Audiobooks"], ["podcasts", "Podcasts"], ["roms", "Games (Console ROMs)"], ["pcgames", "Games (Windows, Linux, or MacOS)"], ["software", "Software/Warez"], ["genericvideo", "Other Video"], ["genericaudio", "Other Audio"], ["genericsoftware", "Other Software"], ["other", "Something completely different"]]
+TYPES = [["movies", "Movies"], ["tv", "TV"], ["music", "Music"], ["books", "eBooks"], ["papers", "Research Papers/Other Nonfiction"], ["audiobooks", "Audiobooks"], ["podcasts", "Podcasts"], ["roms", "Games (Console ROMs)"], ["pcgames", "Games (Windows, Linux, or MacOS)"], ["software", "Software/Warez"], ["images", "Images (SFW)"], ["genericvideo", "Other Video"], ["genericaudio", "Other Audio"], ["genericsoftware", "Other Software"], ["genericdocument", "Other Documents"], ["torrents", "Torrents or magnets"], ["nfo", "NFOs"], ["nfts", "Right-Clicked or Screenshotted NFTs"], ["other", "Something completely different"]]
 DEBUG = True # enables flask debug mode
 # DO NOT CHANGE ANYTHING BELOW THIS LINE
 TYPES_DICT = {i[0]: i[1] for i in TYPES}
@@ -80,7 +80,7 @@ def admin():
     if request.method == "POST":
         # literally just set the cookie and redirect to the admin page
         if request.form["password"] == ADMIN_PASSWD:
-            resp = app.make_response(render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], types=TYPES_DICT))
+            resp = app.make_response(render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], reviewed=suggestions["reviewed"], types=TYPES_DICT))
             resp.set_cookie("password", ADMIN_PASSWD)
             return resp
         else:
@@ -88,7 +88,7 @@ def admin():
     if request.cookies.get("password") != ADMIN_PASSWD:
         return render_template("admin_login.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, msg="Please log in to access the admin panel.")
     else:
-        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], types=TYPES_DICT)
+        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], reviewed=suggestions["reviewed"], types=TYPES_DICT)
 
 @app.route("/admin/review", methods=["POST"])
 def admin_review():
@@ -98,17 +98,31 @@ def admin_review():
         load_suggestions()
         suggestions["reviewed"].append(suggestions["pending"][int(request.form["id"])])
         suggestions["reviewed"][-1]["approved"] = True
+        suggestions["reviewed"][-1]["added"] = False
         suggestions["pending"].pop(int(request.form["id"]))
         save_suggestions()
-        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], types=TYPES_DICT)
+        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], reviewed=suggestions["reviewed"], types=TYPES_DICT, msg="Accepted suggestion!")
     elif request.form["action"] == "reject":
         load_suggestions()
         suggestions["rejected"].append(suggestions["pending"][int(request.form["id"])])
         suggestions["pending"].pop(int(request.form["id"]))
         save_suggestions()
-        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], types=TYPES_DICT)
+        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], reviewed=suggestions["reviewed"], types=TYPES_DICT, msg="Rejected suggestion!")
     else:
-        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], types=TYPES_DICT)
+        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], reviewed=suggestions["reviewed"], types=TYPES_DICT)
+
+@app.route("/admin/markadded/<id>")
+def mark_added(id):
+    if request.cookies.get("password") != ADMIN_PASSWD:
+        return render_template("admin_login.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, msg="Please log in to access the admin panel.")
+    load_suggestions()
+    if not suggestions["reviewed"][int(id)]["added"]:
+        suggestions["reviewed"][int(id)]["added"] = True
+        save_suggestions()
+        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], reviewed=suggestions["reviewed"], types=TYPES_DICT, msg="Marked as added!")
+    else:
+        return render_template("admin.html", title="(Admin) "+BASETITLE, backto=BACKTO, backto_text=BACKTOTEXT, footer_msg=FOOTER, suggestions=suggestions["pending"], reviewed=suggestions["reviewed"], types=TYPES_DICT, msg="Looks like that's already been marked as added")
+
 
 @app.route("/logout")
 def admin_logout():
