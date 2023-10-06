@@ -1,0 +1,9 @@
+{% extends "common.html" %}
+
+{% block content %}
+<ul>
+    {% for suggestion in suggestions %}
+    <li>{{ suggestion["title"] }} ({{ types[suggestion["type"]] }}) {% if suggestion["approved"] %}- <b>APPROVED</b>{% endif %}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

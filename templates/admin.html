@@ -1,0 +1,11 @@
+{% extends "common.html" %}
+
+{% block content %}
+<p>{{ msg|safe }}</p>
+
+{% set i = 0 %}
+{% for suggestion in suggestions %}
+    <p>{{ suggestion["title"] }} ({{ types[suggestion["type"]] }}) - ID {{ i }} </p>
+    {% set i = i + 1 %}
+{% endfor %}
+{% endblock %}

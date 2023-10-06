@@ -1,0 +1,12 @@
+{% extends "common.html" %}
+
+{% block content %}
+<p>{{ msg|safe }}</p>
+
+<form action="/admin" method="POST">
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password" required>
+    <br>
+    <input type="submit" value="Login">
+</form>
+{% endblock %}
